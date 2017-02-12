@@ -1,15 +1,14 @@
 
 #include <Servo.h> 
-#include <avr/interrupt.h>
+#include <NewPing.h>
 
-volatile char val, tempVal;
-volatile long duration;
-volatile long pulseTime;
+char val, tempVal;
+
 
 const int buttonPin = 4;
 const int trigPin = 6;
 const int echoPin = 5;
-const int interuptPin = 0;
+int inches;
 
 bool pressed = false, sensed = false;
 
@@ -17,21 +16,15 @@ unsigned long time, previousTime = 0;
 
 Servo myservo;
 
+NewPing sonar(trigPin, echoPin, 30);
+
 void setup()
 {
   Serial.begin(9600);
   myservo.attach(9);
   pinMode(buttonPin, INPUT_PULLUP);
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-  //pinMode(interuptPin, INPUT_PULLUP);  // Enable pullup resistor
-  attachInterrupt(interuptPin, pulseTest, RISING);
 }
 
-void pulseTest()
-{
-  ultraWrite();
-}
 
 void loop ()
 {
@@ -44,27 +37,14 @@ void loop ()
   tempVal = val;
 }
 
+
+
 void ultraRead()
-{ 
-  delay(2000);
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  pulseTime = micros();
-
-}
-
-void ultraWrite()
 {
-    duration = (micros() - pulseTime);
+
+    inches = sonar.ping_in(30);
   
-   int inches = duration / 74 / 2;
-  
-  Serial.println(inches);
-  
-   if(inches <= 7 && inches > 1 && (time - 2000) > previousTime)
+   if(inches <= 7 && inches > 0 && (time - 2000) > previousTime)
   {
    sensed = true;
    previousTime = time;
