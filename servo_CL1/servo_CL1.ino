@@ -31,6 +31,7 @@ void loop ()
   time = millis();
   ultraRead();
   buttonRead();
+  serialRead();
   if(tempVal != val){
     setServo();
   }
@@ -77,8 +78,9 @@ void buttonRead()
   }
 }
 
-void serialEvent()
+void serialRead()
 {
+  delay(90);
   if (Serial.available() > 0) 
   {
     val = Serial.read();
